@@ -25,6 +25,23 @@ def retriveFile(name, sok):
                         sok.send(bytesToSend)
         else:
             sok.send("ERR")
+    elif useresponse[:2] == "02":
+        sok.sendall("OK".encode('utf-8'))
+        filename = sok.recv(1024).decode('utf-8')
+        print(filename)
+        uploadfile = "upload_" + filename
+        if os.path.isfile('server/' + uploadfile):
+            print("File already exists in Server")
+            sok.send("ERR")
+        else:
+            with open('server/' + uploadfile, 'wb') as file_to_write:
+                while True:
+                    data = sok.recv(1024)
+                    print(data)
+                    if not data:
+                        break
+                    file_to_write.write(data)
+                print("File Uploaded")
     elif useresponse[:2] == "03":
         print "test2"
         sok.send(bytesToSend)
@@ -40,6 +57,16 @@ def retriveFile(name, sok):
             newFileList = pickle.dumps(newf)
             sok.send(newFileList)
         else:
+            sok.send("ERR")
+    elif useresponse[:2] == "04":
+        sok.sendall("OK".encode('utf-8'))
+        filename = sok.recv(1024)
+        print(filename)
+        if os.path.isfile('server/' + filename):
+            os.remove('server/' +filename)
+            print("File removed successfully!")
+        else:
+            print("File not found in Server!")
             sok.send("ERR")
     sok.close()
 
