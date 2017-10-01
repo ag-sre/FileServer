@@ -65,12 +65,19 @@ def Upload(s):
         if file != 'q':
             file = file.split('\n')
             if file[0] in fl:
-                print("File present in system,uploading..")
                 s.sendall(file[0].encode('utf-8'))
-                if(s.recv(1024) == "ERR"):
-                    print("File already exists in Server!!")
-                else:
+                if(s.recv(1024) == "UPLOAD"):
+                    print("UPLOADING AN EXISTING FILE BY OVERWRITING")
+
                     with open(file[0], 'rb') as file_to_send:
+                        print ("FILE CONTENTS")
+                        for data in file_to_send:
+                            print (data)
+                            s.sendall(data)
+                else:
+                    print("UPLOADING A NEW FILE")
+                    with open(file[0], 'rb') as file_to_send:
+                        print ("FILE CONTENTS")
                         for data in file_to_send:
                             s.sendall(data)
                     print('end')

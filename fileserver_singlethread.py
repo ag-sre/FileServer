@@ -5,14 +5,12 @@ import os
 def retriveFile(name, sok):
     useresponse="01"
     while useresponse!="05":
-        print "testloop"
         useresponse = sok.recv(1024)
         print (useresponse[:2])
         fl = []
         for dirpath, dirnames, filenames in os.walk('./'):
             fl.extend(filenames)
         bytesToSend = pickle.dumps(fl)
-        print "test"
         if useresponse[:2] == "01":
             sok.send(bytesToSend)
             filename = sok.recv(1024)
@@ -34,9 +32,18 @@ def retriveFile(name, sok):
             print(filename)
             uploadfile = filename
             if os.path.isfile(uploadfile):
-                print("File already exists in Server")
-                sok.send("ERR")
+                print("UPLOADING FILE BY OVERWRITING EXISTING FILE")
+                sok.send("UPLOAD")
+                with open(uploadfile, 'r+') as file_to_write:
+                    while True:
+                        data = sok.recv(1024)
+                        print(data)
+                        if not data:
+                            break
+                        file_to_write.write(data)
+                    print("File Uploaded")
             else:
+                print("UPLOADING A NEW FILE")
                 with open(uploadfile, 'wb') as file_to_write:
                     while True:
                         data = sok.recv(1024)
